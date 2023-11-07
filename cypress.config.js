@@ -4,7 +4,7 @@ module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       // implement node event listeners here
-      allureWriter(on, config);
+      // allureWriter(on, config);
       return config;
     },
     env: {
@@ -12,7 +12,7 @@ module.exports = defineConfig({
       download_dir: "./cypress/downloads",
       snapshotOnly: true,
     },
-    baseUrl:"https://opensource-demo.orangehrmlive.com/",
+    baseUrl:"https://opensource-demo.orangehrmlive.com/web/index.php/",
     specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}',
     allureResultsPath: "allure-results",
     videosFolder: "allure-results/",
