@@ -8,6 +8,11 @@ import { EmployeeJobDetailsPayload } from "../../APIs/PIM/payload/employeeJobDet
 import { EmployeeJobDetailsResponse } from "../../APIs/PIM/response/employeeJobDetailsResponse";
 import { EmployeeSalaryDetailsPayload } from "../../APIs/PIM/payload/employeeSalaryDetailsPayload";
 import { EmployeeSalaryDetailsResponse } from "../../APIs/PIM/response/employeeSalaryDetailsResponse";
+import { EmployeeContactDetailsPayload } from "../../APIs/PIM/payload/addContactPayload";
+import { EmployeeContactDetailsResponse } from "../../APIs/PIM/response/addContactResponse";
+import { DeletedReportPayload } from "../../APIs/PIM/payload/deleteReportPayload";
+import { DeletedReportResponse } from "../../APIs/PIM/response/deleteReportResponse";
+import { EmployeeDetailsPayload } from "../../APIs/PIM/payload/employeeDetailsPayload";
 
 declare global {
     namespace Cypress {
@@ -15,8 +20,10 @@ declare global {
             addEmployee: (requestUrl: string, employeePayload: AddEmployeePayload) => Chainable<AddEmployeeResponse>;
             addEmployeeLoginInfo: (requestUrl: string, employeeLoginInfoPayload: EmployeeLoginInfoPayload) => Chainable<EmployeeLoginInfoResponse>;
             addReport: (requestUrl: string, reportPayload: DefineReportPayload) => Chainable<DefineReportResponse>;
-            addEmployeeJobDetails: (requestUrl: string, employeeJobDetailsPayload: EmployeeJobDetailsPayload) => Chainable<EmployeeJobDetailsResponse>;
+            addEmployeeDetails: (requestUrl: string, employeeDetailsPayload: EmployeeJobDetailsPayload | EmployeeDetailsPayload) => Chainable<EmployeeJobDetailsResponse> | Chainable<EmployeeJobDetailsResponse>;
             addEmployeeSalaryDetails: (requestUrl: string, employeeSalaryDetailsPayload: EmployeeSalaryDetailsPayload) => Chainable<EmployeeSalaryDetailsResponse>;
+            addEmployeeContact: (requestUrl: string, employeeContactPayload: EmployeeContactDetailsPayload) => Chainable<EmployeeContactDetailsResponse>;
+            deleteReport: (requestUrl: string, deletedReportPayload: DeletedReportPayload) => Chainable<DeletedReportResponse>;
         }
     }
 }
@@ -54,7 +61,7 @@ Cypress.Commands.add('addReport', (requestUrl: string, reportPayload: DefineRepo
     }).its('body');
 });
 
-Cypress.Commands.add('addEmployeeJobDetails', (requestUrl: string, employeeJobDetailsPayload: EmployeeJobDetailsPayload) => {
+Cypress.Commands.add('addEmployeeDetails', (requestUrl: string, employeeJobDetailsPayload: EmployeeJobDetailsPayload | EmployeeDetailsPayload) => {
     return cy.api({
         method: 'PUT',
         url: requestUrl,
@@ -70,6 +77,28 @@ Cypress.Commands.add('addEmployeeSalaryDetails', (requestUrl: string, employeeSa
         method: 'POST',
         url: requestUrl,
         body: employeeSalaryDetailsPayload,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).its('body');
+});
+
+Cypress.Commands.add('addEmployeeContact', (requestUrl: string, employeeContactPayload: EmployeeContactDetailsPayload) => {
+    return cy.api({
+        method: 'POST',
+        url: requestUrl,
+        body: employeeContactPayload,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).its('body');
+});
+
+Cypress.Commands.add('deleteReport', (requestUrl: string, deleteReportPayload: DeletedReportPayload) => {
+    return cy.api({
+        method: 'DELETE',
+        url: requestUrl,
+        body: deleteReportPayload,
         headers: {
             'Content-Type': 'application/json'
         }

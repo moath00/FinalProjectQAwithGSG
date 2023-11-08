@@ -9,6 +9,7 @@ const employeesCount = 3;
 const employeeIds: number[] = [];
 let locationId: number;
 let jobTitleId: number;
+let reportId: string;
 
 const HRMOrangeURLs = {
     loginPage: '',
@@ -16,13 +17,15 @@ const HRMOrangeURLs = {
 
 describe("Test the APIs with cypress", () => {
 
-    before(() => {
+    beforeEach(() => {
         cy.visit(HRMOrangeURLs.loginPage);
         logger.passedLogin("admin", "admin123");
         cy.fixture('employee').as('employee');
         cy.fixture('jobTitle').as('jobTitle');
         cy.fixture('location').as('location');
         cy.fixture('salary').as('salary');
+        cy.fixture('contact').as('contact');
+        cy.fixture('details').as('details');
 
         cy.get('@jobTitle').then((jobTitle: any) => {
             AdminPage.createJobTitleViaAPI(jobTitle)
@@ -42,10 +45,15 @@ describe("Test the APIs with cypress", () => {
                         .then((response) => {
                             employeeIds.push(response.data.empNumber);
                             PIMpage.createEmployeeWithLoginInfoViaAPI(employee, employeeIds[employeeNumber]);
-                            PIMpage.addJobTitleToEmployeeViaAPI(employeeIds[employeeNumber], jobTitleId)
+                            cy.get('@details').then((details) => {
+                                PIMpage.addEmployeeDetailsViaAPI(details, employeeIds[employeeNumber], jobTitleId, locationId)
+                            });
                             cy.get('@salary').then((salary) => {
                                 PIMpage.addSalaryToEmployeeViaAPI(employeeIds[employeeNumber], salary);
-                                PIMpage.addJobTitleToEmployeeViaAPI(employeeIds[employeeNumber], jobTitleId);
+                                // PIMpage.addEmployeeDetailsViaAPI(employeeIds[employeeNumber], jobTitleId);
+                                cy.get('@contact').then((contact) => {
+                                    PIMpage.addContactToEmployeeViaAPI(employeeIds[employeeNumber], contact);
+                                });
                             });
                         })
                 }
@@ -59,13 +67,18 @@ describe("Test the APIs with cypress", () => {
             // PIMpage.defineReportViaAPI(reportInfo); // reportInfo json object changed to suit the UI needed information
             PIMpage.open();
             PIMpage.viewReports();
-            PIMpage.defineReportViaUI(reportInfo);
-        })
+            PIMpage.defineReportViaUI(reportInfo)
+                .then((id) => {
+                    reportId = id;
+                })
+        });
+        // PIMpage.assertReport()
     });
 
-    after(() => {
+    afterEach(() => {
         AdminPage.deleteEmployeeViaAPI(employeeIds);
         AdminPage.deleteJobTitleViaAPI([jobTitleId]);
         AdminPage.deleteLocationViaAPI([locationId]);
+        PIMpage.deleteReportViaAPI(reportId);
     });
 });

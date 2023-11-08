@@ -1,11 +1,11 @@
-import { DefineReportResponse } from "../../support/APIs/PIM/response/defineReportResponse";
-import { AddEmployeeResponse } from "../../support/APIs/PIM/response/addEmployeeResponse";
 import Sidebar from "../../support/Helpers/sidebar-switch-helper";
 import EmployeeInit from "../../support/Init/employeeInit";
 import EmployeeLoginInfoInit from "../../support/Init/employeeWithLoginInit";
 import ReportInit from "../../support/Init/reportInit";
-import EmployeeJobDetailsInit from "../../support/Init/EmployeeJobDetailsInit";
+import EmployeeJobDetailsInit from "../../support/Init/employeeJobDetailsInit";
 import EmployeeSalaryDetailsInit from "../../support/Init/employeeSalaryDetailsInit";
+import EmployeeContactDetailsInit from "../../support/Init/addContactsInit";
+import DeletedReportInit from "../../support/Init/deleteReportInit";
 
 const sidebar = new Sidebar();
 
@@ -13,8 +13,10 @@ export const PIM_URLs = {
     addEmployee: 'api/v2/pim/employees',
     addEmployeeLoginInfo: 'api/v2/admin/users',
     defineReport: 'api/v2/pim/reports/defined',
-    jobDetails: (id: number) => `/api/v2/pim/employees/${id}/job-details`,
+    jobDetails: (id: number) => `api/v2/pim/employees/${id}/job-details`,
     salaryComponent: (id: number) => `api/v2/pim/employees/${id}/salary-components`,
+    contactAndLocation: (id: number) => `api/v2/pim/employees/${id}/emergency-contacts`,
+    deleteReport: 'api/v2/pim/reports/defined',
 }
 
 export default class PIM {
@@ -31,6 +33,10 @@ export default class PIM {
         addCriteriaBtn: () => cy.get('.oxd-icon-button'),
         addDisplayFieldBtn: () => cy.get('.oxd-icon-button').eq(5),
         saveReportBtn: () => cy.get('.oxd-button--secondary'),
+        reportLocators: {
+            reportHeader: () => cy.get('.oxd-table-header'),
+            reportBody: () => cy.get('.oxd-table-body'),
+        }
     }
 
     open(): void {
@@ -57,14 +63,14 @@ export default class PIM {
         this.elements.droppedItemsToChoose().contains('span', data.criteria.firstCriteria.name).click();
         this.elements.addCriteriaBtn().eq(2).click();
         this.elements.reportDropdownFields().eq(2).click();
-        this.elements.appearedListBox().scrollTo(0, 100);
+        // this.elements.appearedListBox().scrollTo(0, 100);
         this.elements.droppedItemsToChoose().contains('span', data.criteria.firstCriteria.value).click();
         this.elements.reportDropdownFields().eq(0).click();
         this.elements.appearedListBox().scrollTo(0, 350);
         this.elements.droppedItemsToChoose().contains('span', data.criteria.secondCriteria.name).click();
         this.elements.addCriteriaBtn().eq(2).click();
         this.elements.reportDropdownFields().eq(3).click();
-        this.elements.appearedListBox().scrollTo(0, 70);
+        // this.elements.appearedListBox().scrollTo(0, 70);
         this.elements.droppedItemsToChoose().contains('span', data.criteria.secondCriteria.value).click();
         this.elements.reportDropdownFields().eq(4).click();
         this.elements.droppedItemsToChoose().contains('span', data.fields.firstField.name).click();
@@ -85,17 +91,45 @@ export default class PIM {
         this.elements.droppedItemsToChoose().contains('span', data.fields.thirdField.value).click();
         this.elements.addDisplayFieldBtn().click();
         this.elements.saveReportBtn().click();
+        cy.intercept('https://opensource-demo.orangehrmlive.com/web/index.php/pim/displayPredefinedReport/**').as('report');
+        cy.wait('@report');
+        // return the id of the report from its page url
+        return cy.url().then((url) => url.split('/')[7]);
+        // .orangehrm-background-container
     }
 
     defineReportViaAPI(date: any) {
         return cy.addReport(PIM_URLs.defineReport, ReportInit.initReport(date));
     }
 
-    addJobTitleToEmployeeViaAPI(employeeId: number, jobId: number) {
-        return cy.addEmployeeJobDetails(PIM_URLs.jobDetails(employeeId), EmployeeJobDetailsInit.initJobDetails({ joinedDate: null, jobTitleId: jobId }));
+    addEmployeeDetailsViaAPI(data: any, employeeId: number, jobId?: number, locationId?: number) {
+        return cy.addEmployeeDetails(PIM_URLs.jobDetails(employeeId), EmployeeJobDetailsInit.initJobDetails(data, jobId, locationId));
     }
 
     addSalaryToEmployeeViaAPI(employeeId: number, data: any) {
         return cy.addEmployeeSalaryDetails(PIM_URLs.salaryComponent(employeeId), EmployeeSalaryDetailsInit.initSalary(data));
+    }
+
+    addContactToEmployeeViaAPI(employeeId: number, data: any) {
+        return cy.addEmployeeContact(PIM_URLs.contactAndLocation(employeeId), EmployeeContactDetailsInit.initContact(data));
+    }
+
+    deleteReportViaAPI(reportId: string) {
+        return cy.deleteReport(PIM_URLs.deleteReport, DeletedReportInit.initReport(reportId));
+    }
+
+    assertReport(columnHeader: string, expectedValue: string) {
+        // Find the idex of the column depends on the header label
+        this.elements.reportLocators.reportHeader().contains(columnHeader).invoke('index').then((columnIndex: any) => {
+            // I Find all rows in the table body
+            this.elements.reportLocators.reportBody().find('.oxd-table-card').each((elem) => {
+                cy.wrap(elem).find('.oxd-table-row').find('.oxd-table-cell').eq(columnIndex).invoke('text').then((cell) => {
+                    if (cell.trim() === expectedValue.trim()) {
+                        // Expected Value in the row cell of index header, the test should pass
+                        expect(cell.trim(), `Found the row with ${columnHeader} = ${expectedValue}`).to.equal(expectedValue.trim());
+                    }
+                })
+            });
+        });
     }
 }

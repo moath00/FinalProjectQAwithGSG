@@ -1,3 +1,3 @@
 export interface DeletedLocationPayload{
-    ids: number[]
+    ids: string[]
 }
