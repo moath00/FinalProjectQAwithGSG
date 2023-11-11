@@ -15,7 +15,7 @@ const HRMOrangeURLs = {
     loginPage: '',
 }
 
-describe("Test the APIs with cypress", () => {
+describe("PIM page - Define a report", () => {
 
     beforeEach(() => {
         cy.visit(HRMOrangeURLs.loginPage);
@@ -61,7 +61,7 @@ describe("Test the APIs with cypress", () => {
         });
     });
 
-    it("APIs should be available", () => {
+    it("User create report and view data", () => {
         cy.fixture('report').as('report');
         cy.get('@report').then((reportInfo) => {
             // PIMpage.defineReportViaAPI(reportInfo); // reportInfo json object changed to suit the UI needed information
@@ -72,7 +72,7 @@ describe("Test the APIs with cypress", () => {
                     reportId = id;
                 })
         });
-        // PIMpage.assertReport()
+        PIMpage.assertReport(reportHeader, expectedData);
     });
 
     afterEach(() => {
