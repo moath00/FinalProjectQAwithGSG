@@ -76,7 +76,7 @@ describe("PIM page - Define a report", () => {
                     reportId = id;
                 })
         });
-        // PIMpage.assertReport(reportHeader, expectedData);
+        PIMpage.assertReport(reportHeader, expectedData);
     });
 
     afterEach(() => {
