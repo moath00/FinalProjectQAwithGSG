@@ -19,7 +19,7 @@ export default class ClaimEmp {
     }
 
     requestClaim(eventId: number, data: any) {
-        const completeData = { claimEventId: eventId, currencyId: data.currencyId, remarks: data.remarks };
+        const completeData = { "claimEventId": eventId, "currencyId": data.currencyId, "remarks": data.remarks };
         return cy.requestClaim(URLs.requestClaim, RequestClaimPayloadInit.initRequest(completeData));
     }
 
