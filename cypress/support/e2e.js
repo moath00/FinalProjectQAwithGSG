@@ -18,6 +18,7 @@ import './commands';
 import 'cypress-plugin-api';
 import './utils/APIUtils/AdminUtils';
 import './utils/APIUtils/PIMUtils';
+import './utils/APIUtils/ClaimUtils';
 import '@shelex/cypress-allure-plugin';
 
 // Alternatively you can use CommonJS syntax:
