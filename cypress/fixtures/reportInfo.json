@@ -1,0 +1,4 @@
+{
+    "reportHeaders": ["Employee First Name", "Job Title", "Amount"],
+    "expectedValues": ["Moath", "", "40000"]
+}
