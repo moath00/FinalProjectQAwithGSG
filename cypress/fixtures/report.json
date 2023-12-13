@@ -1,0 +1,28 @@
+{
+    "name": "Testers - M - QA",
+    "include": "onlyCurrent",
+    "criteria": {
+        "firstCriteria": {
+            "name": "Job Title",
+            "value": "QA QC Engineer"
+        },
+        "secondCriteria": {
+            "name": "Location",
+            "value": "Home"
+        }
+    },
+    "fields": {
+        "firstField": {
+            "name": "Personal",
+            "value": "First Name"
+        },
+        "secondField": {
+            "name": "Job",
+            "value": "Job Title"
+        },
+        "thirdField": {
+            "name": "Salary",
+            "value": "Amount"
+        }
+    }
+}

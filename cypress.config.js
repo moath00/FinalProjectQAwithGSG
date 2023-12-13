@@ -1,4 +1,5 @@
 const { defineConfig } = require("cypress");
+const allureWriter = require("@shelex/cypress-allure-plugin/writer");
 
 module.exports = defineConfig({
   e2e: {
@@ -8,15 +9,17 @@ module.exports = defineConfig({
       return config;
     },
     env: {
+      allure: true,
       allureReuseAfterSpec: true,
       download_dir: "./cypress/downloads",
       snapshotOnly: true,
     },
-    baseUrl:"https://opensource-demo.orangehrmlive.com/",
+    allure: true,
+    baseUrl: "https://opensource-demo.orangehrmlive.com/web/index.php/",
     specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}',
     allureResultsPath: "allure-results",
     videosFolder: "allure-results/",
     screenshotOnRunFailure: true,
-    allureAttachRequests:true,
+    allureAttachRequests: true,
   },
 });
