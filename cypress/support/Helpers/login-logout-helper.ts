@@ -1,3 +1,7 @@
+export const HRMOrangeURLs = {
+  LOGIN_PAGE: "",
+};
+
 export default class Logger {
   elements = {
     userNameField: () => cy.get('[placeholder="Username"]'),
@@ -10,6 +14,11 @@ export default class Logger {
       ),
   };
 
+  openLoginPage(): void {
+    cy.intercept(HRMOrangeURLs.LOGIN_PAGE).as("openedLoginPage");
+    cy.wait("@openedLoginPage");
+  }
+
   passedLogin(username: string, password: string): void {
     this.elements.userNameField().type(username);
     this.elements.passwordField().type(password);
@@ -17,8 +26,6 @@ export default class Logger {
   }
 
   logOutLoggedUser() {
-    // this.elements.logoutList().click();
-    // this.elements.logoutBtn().click();
     cy.intercept(
       "https://opensource-demo.orangehrmlive.com/web/index.php/core/i18n/messages**"
     ).as("messages");

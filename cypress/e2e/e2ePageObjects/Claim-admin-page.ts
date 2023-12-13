@@ -77,7 +77,7 @@ export default class ClaimAdmin {
       });
   }
 
-  approveClaim(claimRequestId: number, action: string) {
+  actionOnClaim(claimRequestId: number, action: string) {
     cy.visit(URLs.claimPageToAction(claimRequestId));
     cy.intercept(
       "https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/claim/requests/**"

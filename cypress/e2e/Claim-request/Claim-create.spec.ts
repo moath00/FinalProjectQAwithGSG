@@ -27,17 +27,13 @@ const CLAIM_ACTIONS = {
   CANCEL: "CANCEL",
 };
 
-const HRMOrangeURLs = {
-  LOGIN_PAGE: "",
-};
-
 const Headers = ["Submitted Date", "Status", "Amount"];
 const approvedValues = ["2023-11-11", "Paid", "0.00"];
 const rejectedValues = ["2023-11-11", "Rejected", "0.00"];
 
 describe("Claim System - Claims", () => {
   beforeEach(() => {
-    cy.visit(HRMOrangeURLs.LOGIN_PAGE);
+    logger.openLoginPage();
     logger.passedLogin(ADMIN_INFO.USERNAME, ADMIN_INFO.PASSWORD);
 
     cy.fixture("employee").as("employee");
@@ -47,12 +43,6 @@ describe("Claim System - Claims", () => {
       adminClaim.createEvent(event).then((eventInfo: any) => {
         eventId = eventInfo.data.id;
       });
-
-      // cy.writeFile('../../fixtures/claim', `{
-      //   "claimEventId": "${eventId}",
-      //   "currencyId": "DZD",
-      //   "remarks": "Testing - request claim by employee."
-      // }`);
 
       cy.fixture("claim").as("claim");
 
@@ -84,19 +74,19 @@ describe("Claim System - Claims", () => {
   });
 
   it("The admin should be able to approve a claim to employee.", () => {
-    adminClaim.approveClaim(requestClaimId, CLAIM_ACTIONS.APPROVE);
+    adminClaim.actionOnClaim(requestClaimId, CLAIM_ACTIONS.APPROVE);
     for (let index = 0; index < Headers.length; index++) {
       adminClaim.assertTheRecord(Headers[index], approvedValues[index]);
     }
   });
   it("The admin should be able to reject a claim to employee.", () => {
-    adminClaim.approveClaim(requestClaimId, CLAIM_ACTIONS.REJECTED);
+    adminClaim.actionOnClaim(requestClaimId, CLAIM_ACTIONS.REJECTED);
     for (let index = 0; index < Headers.length; index++) {
       adminClaim.assertTheRecord(Headers[index], rejectedValues[index]);
     }
   });
 
-  beforeEach(() => {
+  afterEach(() => {
     adminPage.deleteEmployeeViaAPI([employeeId]);
     adminClaim.deleteEvent(eventId);
   });
