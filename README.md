@@ -25,9 +25,20 @@
 ## Solution:
 
 * Setup the project:
-    - install cypress : npm install cypress --save-dev
-    - open cypress (cypress folder generate) : npx cypress open || npx cypress run
-    - install typescript : npm install typescript --save-dev
-    - initiate the tsconfig.json : tsc --init
-    - edit some configuration in package.json : 
-    - edit some configuration in cypress.config.json : 
+    - install cypress : **npm install cypress --save-dev**
+    - open cypress (cypress folder generate) : **npx cypress open || npx cypress run**
+    - install typescript : **npm install typescript --save-dev**
+    - initiate the tsconfig.json : **tsc --init**
+    - modify some configuration in **package.json** : ...
+    - modify some configuration in **cypress.config.js** : ...
+    - modify some configuration in **tsconfig.json** : ...
+    - delete **node_modules and package-lock.json** to install again with dependencies
+    - build the e2e Page Objects (**POM**)
+    - build the APIs payloads and responses
+    - build the helpers and the initializers needed
+    - build the API commands
+    - add the fixtures data needed for the APIs and the initializers
+    - build the phase1 spec
+    - run the spec in the hideless mode : **npx cypress run || npx cypress run -s cypress/spec/path/to/run**
+    - generate the report data to view : allure generate
+    - generate the report html page to visit : allure serve

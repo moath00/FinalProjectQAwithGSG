@@ -1,0 +1,7 @@
+{
+    "salaryComponent": "Basic salary",
+    "salaryAmount": "40000",
+    "currencyId": "DZD",
+    "comment": "Coming soon",
+    "addDirectDeposit": false
+}
