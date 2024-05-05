@@ -10,6 +10,7 @@ const employeeIds: number[] = [];
 let locationId: number;
 let jobTitleId: number;
 let jobTitleName: string;
+let jobTitleName: string;
 let reportId: string;
 const ADMIN_INFO = {
 	USERNAME: "admin",
@@ -23,7 +24,7 @@ const HRMOrangeURLs = {
 describe("PIM page - Define a report", () => {
 	beforeEach(() => {
 		cy.visit(HRMOrangeURLs.LOGIN_PAGE);
-		logger.passedLogin(ADMIN_INFO.PASSWORD, ADMIN_INFO.USERNAME);
+		logger.passedLogin(ADMIN_INFO.USERNAME, ADMIN_INFO.PASSWORD);
 		cy.fixture("employee").as("employee");
 		cy.fixture("jobTitle").as("jobTitle");
 		cy.fixture("location").as("location");
@@ -35,6 +36,7 @@ describe("PIM page - Define a report", () => {
 			AdminPage.createJobTitleViaAPI(jobTitle).then(
 				(response) => {
 					jobTitleId = response.data.id;
+					jobTitleName = response.data.title;
 				}
 			);
 		});
@@ -120,6 +122,41 @@ describe("PIM page - Define a report", () => {
 			});
 		});
 		PIMpage.assertReport(reportHeader, expectedData);
+	});
+	it("User create report and view data", () => {
+		cy.fixture("reportDefine").as("reportDef");
+		cy.get("@reportDef").then((reportDefine) => {
+			// PIMpage.defineReportViaAPI(reportInfo); // reportInfo json object changed to suit the UI needed information
+			PIMpage.open();
+			PIMpage.viewReports();
+			PIMpage.defineReportViaUI(reportDefine).then(
+				(response: any) => {
+					reportId =
+						response.request.query.reportId;
+				}
+			);
+		});
+		cy.fixture("reportInfo").as("reportInfo");
+		cy.get("@reportInfo").then((reportInfo: any) => {
+			let repoHeaders = reportInfo.reportHeaders;
+			let repoValues = reportInfo.expectedValues;
+			for (
+				let index: number = 0;
+				index < repoHeaders.length - 1;
+				index++
+			) {
+				if (index == 1) {
+					PIMpage.assertReport(
+						repoHeaders[index],
+						jobTitleName
+					);
+				}
+				PIMpage.assertReport(
+					repoHeaders[index],
+					repoValues[index]
+				);
+			}
+		});
 	});
 
 	afterEach(() => {

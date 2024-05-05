@@ -1,11 +1,11 @@
-import { RequestClaimPayload } from "../APIs/Claim/payload/requestClaimPayload"
+import { RequestClaimPayload } from "../APIs/Claim/payload/requestClaimPayload";
 
 export default class RequestClaimPayloadInit {
-    static initRequest(data: any): RequestClaimPayload {
-        return {
-            claimEventId: data.claimEventId,
-            currencyId: data.currency,
-            remarks: data.remarks
-        }
-    }
+  static initRequest(eventId: number, data: any): RequestClaimPayload {
+    return {
+      claimEventId: eventId,
+      currencyId: data.currencyId,
+      remarks: data.remarks,
+    };
+  }
 }

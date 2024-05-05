@@ -16,74 +16,78 @@ let eventId: number;
 let requestClaimId: number;
 
 const ADMIN_INFO = {
-    USERNAME: "admin",
-    PASSWORD: "admin123",
-}
+  USERNAME: "admin",
+  PASSWORD: "admin123",
+};
 
 const CLAIM_ACTIONS = {
-    SUBMIT: "SUBMIT",
-    APPROVE: "APPROVE",
-    REJECTED: "REJECTED",
-    CANCEL: "CANCEL",
-}
-
-const HRMOrangeURLs = {
-    LOGIN_PAGE: '',
-}
+  SUBMIT: "SUBMIT",
+  APPROVE: "APPROVE",
+  REJECTED: "REJECTED",
+  CANCEL: "CANCEL",
+};
 
 const Headers = ["Submitted Date", "Status", "Amount"];
 const approvedValues = ["2023-11-11", "Paid", "0.00"];
 const rejectedValues = ["2023-11-11", "Rejected", "0.00"];
 
 describe("Claim System - Claims", () => {
-    beforeEach(() => {
-        cy.visit(HRMOrangeURLs.LOGIN_PAGE);
-        logger.passedLogin(ADMIN_INFO.USERNAME, ADMIN_INFO.PASSWORD);
+  beforeEach(() => {
+    logger.openLoginPage();
+    logger.passedLogin(ADMIN_INFO.USERNAME, ADMIN_INFO.PASSWORD);
 
-        cy.fixture('employee').as('employee');
-        cy.fixture('event').as('event');
-        cy.fixture('claim').as('claim');
+    cy.fixture("employee").as("employee");
+    cy.fixture("event").as("event");
 
-        cy.get('@event').then((event) => {
-            adminClaim.createEvent(event)
-                .then((eventInfo: any) => {
-                    eventId = eventInfo.data[0];
-                });
-            cy.get('@employee').then((employee: any) => {
-                PIMpage.createEmployeeViaAPI(employee)
-                    .then((employeeInfo) => {
-                        employeeId = employeeInfo.data.empNumber;
-                        PIMpage.createEmployeeWithLoginInfoViaAPI(employee, employeeId).then((employeeLoginInfo: any) => {
-                            logger.logOutLoggedUser();
-                            logger.passedLogin(employeeLoginInfo.data.userName, employee.password);
-                        });
-                    });
-                empClaim.open();
-                cy.get('@claim').then((claim) => {
-                    empClaim.requestClaim(eventId, claim)
-                        .then((requestInfo: any) => {
-                            requestClaimId = requestInfo.data.id;
-                            empClaim.actionOnClaimRequest(requestClaimId, CLAIM_ACTIONS.SUBMIT);
-                        });
-                });
-            });
-            logger.logOutLoggedUser();
-            logger.passedLogin(ADMIN_INFO.USERNAME, ADMIN_INFO.PASSWORD);
-            adminClaim.open();
+    cy.get("@event").then((event) => {
+      adminClaim.createEvent(event).then((eventInfo: any) => {
+        eventId = eventInfo.data.id;
+      });
+
+      cy.fixture("claim").as("claim");
+
+      cy.get("@employee").then((employee: any) => {
+        PIMpage.createEmployeeViaAPI(employee).then((employeeInfo) => {
+          employeeId = employeeInfo.data.empNumber;
+          PIMpage.createEmployeeWithLoginInfoViaAPI(employee, employeeId).then(
+            (employeeLoginInfo: any) => {
+              logger.logOutLoggedUser();
+              logger.passedLogin(
+                employeeLoginInfo.data.userName,
+                employee.password
+              );
+            }
+          );
         });
+        empClaim.open();
+        cy.get("@claim").then((claim: any) => {
+          empClaim.requestClaim(eventId, claim).then((requestInfo: any) => {
+            requestClaimId = requestInfo.data.id;
+            empClaim.actionOnClaimRequest(requestClaimId, CLAIM_ACTIONS.SUBMIT);
+          });
+        });
+      });
+      logger.logOutLoggedUser();
+      logger.passedLogin(ADMIN_INFO.USERNAME, ADMIN_INFO.PASSWORD);
+      adminClaim.open();
     });
+  });
 
-    it("The admin should be able to approve a claim to employee.", () => {
-        adminClaim.approveClaim(requestClaimId, CLAIM_ACTIONS.APPROVE);
-        adminClaim.assertTheRecord(Headers, approvedValues);
-    });
-    it("The admin should be able to reject a claim to employee.", () => {
-        adminClaim.approveClaim(requestClaimId, CLAIM_ACTIONS.REJECTED);
-        adminClaim.assertTheRecord(Headers, rejectedValues);
-    });
+  it("The admin should be able to approve a claim to employee.", () => {
+    adminClaim.actionOnClaim(requestClaimId, CLAIM_ACTIONS.APPROVE);
+    for (let index = 0; index < Headers.length; index++) {
+      adminClaim.assertTheRecord(Headers[index], approvedValues[index]);
+    }
+  });
+  it("The admin should be able to reject a claim to employee.", () => {
+    adminClaim.actionOnClaim(requestClaimId, CLAIM_ACTIONS.REJECTED);
+    for (let index = 0; index < Headers.length; index++) {
+      adminClaim.assertTheRecord(Headers[index], rejectedValues[index]);
+    }
+  });
 
-    beforeEach(() => {
-        adminPage.deleteEmployeeViaAPI([employeeId]);
-        adminClaim.deleteEvent(eventId);
-    });
-})
+  afterEach(() => {
+    adminPage.deleteEmployeeViaAPI([employeeId]);
+    adminClaim.deleteEvent(eventId);
+  });
+});
