@@ -9,6 +9,7 @@ const employeesCount = 3;
 const employeeIds: number[] = [];
 let locationId: number;
 let jobTitleId: number;
+let jobTitleName: string;
 let reportId: string;
 const ADMIN_INFO = {
 	USERNAME: "admin",
